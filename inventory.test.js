@@ -11,8 +11,6 @@ describe("Inventory System", () => {
 
   describe("Add Product", () => {
     test("should add a new product successfully", () => {
-      // PREPARAR
-      // TODO: Crear un objeto producto con todos los campos requeridos
       const product = {
         id: 1,
         name: "Producto 1",
@@ -20,52 +18,37 @@ describe("Inventory System", () => {
         stock: 10,
         category: "Electrónica",
       };
-      // EJECUTAR
-      // TODO: Llamar al método addProduct
+
       const response = inventory.addProduct(product);
-      // VALIDAR
+
       expect(response).toEqual({
-        id: 1,
-        name: "Producto 1",
-        price: 100,
-        category: "Electrónica",
-        stock: 10,
+        ...product,
         createdAt: new Date("2023-01-01T00:00:00.000Z"),
       });
 
-      // TODO: Verificar que el producto se agregó correctamente
       expect(inventory.products).toEqual([
         {
-          category: "Electrónica",
+          ...product,
           createdAt: new Date("2023-01-01T00:00:00.000Z"),
-          id: 1,
-          name: "Producto 1",
-          price: 100,
-          stock: 10,
         },
       ]);
-
-      // TODO: Verificar que se agregó la fecha de creación
 
       expect(response.createdAt).toEqual(new Date("2023-01-01T00:00:00.000Z"));
     });
 
     test("should throw error if payload does not have required fields", () => {
-      // Prepare
       const payload = {
         id: 5,
         price: 100,
         category: "Electrónica",
       };
 
-      // Execute
       expect(() => inventory.addProduct(payload)).toThrow(
         "El producto debe tener id, nombre, precio y categoría"
       );
     });
 
     test("should throw error if product already exists", () => {
-      // PREPARAR
       const payload = {
         id: 1,
         name: "Producto 1",
@@ -79,17 +62,15 @@ describe("Inventory System", () => {
         price: 300,
         category: "Hogar",
       };
-      // Execute
+
       inventory.addProduct(alreadyExistingProduct);
 
-      // Validate
       expect(() => inventory.addProduct(payload)).toThrow(
         "Ya existe un producto con este ID"
       );
     });
 
     test("should throw error if price is less than 0", () => {
-      // Prepare
       const payload = {
         id: 1,
         name: "Producto 1",
@@ -97,7 +78,6 @@ describe("Inventory System", () => {
         category: "Electrónica",
       };
 
-      // Execute
       expect(() => inventory.addProduct(payload)).toThrow(
         "El precio debe ser mayor que cero"
       );
@@ -106,59 +86,72 @@ describe("Inventory System", () => {
 
   describe("Update Stock", () => {
     test("should update stock successfully", () => {
-      // PREPARAR
-      // TODO: Crear y agregar un producto con stock inicial
-      // EJECUTAR
-      // TODO: Actualizar el stock del producto
-      // VALIDAR
-      // TODO: Verificar que el stock se actualizó correctamente
-      // TODO: Verificar que se actualizó la fecha de modificación
+      const product = {
+        id: 1,
+        name: "Producto 1",
+        price: 100,
+        stock: 5,
+        category: "Electrónica",
+      };
+
+      inventory.addProduct(product);
+      const updatedProduct = inventory.updateStock(1, 3); // suma stock
+
+      expect(updatedProduct.stock).toBe(8);
+      expect(updatedProduct.updatedAt).toEqual(new Date("2023-01-01T00:00:00.000Z"));
     });
 
     test("should not allow negative stock", () => {
-      // PREPARAR
-      // TODO: Crear y agregar un producto con stock inicial
-      // EJECUTAR y VALIDAR
-      // TODO: Verificar que se lanza el error correcto al intentar reducir el stock por debajo de cero
+      const product = {
+        id: 1,
+        name: "Producto 1",
+        price: 100,
+        stock: 2,
+        category: "Electrónica",
+      };
+
+      inventory.addProduct(product);
+
+      expect(() => inventory.updateStock(1, -3)).toThrow(
+        "El stock no puede ser negativo"
+      );
     });
   });
 
   describe("Get Products by Category", () => {
     test("should return products in category", () => {
-      // PREPARAR
-      // TODO: Crear y agregar varios productos de diferentes categorías
-      // EJECUTAR
-      // TODO: Obtener productos de una categoría específica
-      // VALIDAR
-      // TODO: Verificar que se retornan solo los productos de la categoría solicitada
-      // TODO: Verificar la cantidad correcta de productos
+      inventory.addProduct({ id: 1, name: "TV", price: 500, stock: 5, category: "Electrónica" });
+      inventory.addProduct({ id: 2, name: "Plancha", price: 100, stock: 10, category: "Hogar" });
+      inventory.addProduct({ id: 3, name: "Laptop", price: 800, stock: 2, category: "Electrónica" });
+
+      const electronics = inventory.getProductsByCategory("Electrónica");
+
+      expect(electronics.length).toBe(2);
+      expect(electronics.every(p => p.category === "Electrónica")).toBe(true);
     });
 
     test("should throw error for non-existent category", () => {
-      // PREPARAR
-      // TODO: Crear y agregar productos en categorías existentes
-      // EJECUTAR y VALIDAR
-      // TODO: Verificar que se lanza el error correcto al buscar una categoría inexistente
+      inventory.addProduct({ id: 1, name: "TV", price: 500, stock: 5, category: "Electrónica" });
+
+      expect(() => inventory.getProductsByCategory("Juguetes")).toThrow(
+        "No existen productos en la categoría solicitada"
+      );
     });
   });
 
   describe("Calculate Total Value", () => {
     test("should calculate total inventory value", () => {
-      // PREPARAR
-      // TODO: Crear y agregar varios productos con diferentes precios y cantidades
-      // EJECUTAR
-      // TODO: Calcular el valor total del inventario
-      // VALIDAR
-      // TODO: Verificar que el cálculo del valor total es correcto
+      inventory.addProduct({ id: 1, name: "TV", price: 500, stock: 2, category: "Electrónica" });
+      inventory.addProduct({ id: 2, name: "Mouse", price: 50, stock: 4, category: "Electrónica" });
+
+      const totalValue = inventory.calculateTotalValue();
+
+      expect(totalValue).toBe(500 * 2 + 50 * 4); // 1000 + 200 = 1200
     });
 
     test("should return zero for empty inventory", () => {
-      // PREPARAR
-      // TODO: Asegurarse de que el inventario está vacío
-      // EJECUTAR
-      // TODO: Calcular el valor total del inventario
-      // VALIDAR
-      // TODO: Verificar que el valor total es cero
+      const totalValue = inventory.calculateTotalValue();
+      expect(totalValue).toBe(0);
     });
   });
 });
